@@ -1,197 +1,212 @@
-import { useState } from "react";
-import { Eye, EyeOff, User, Lock } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Eye, EyeOff, Moon, Sun, User, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
+  const [dark, setDark] = useState(() => {
+    return localStorage.getItem("theme") === "dark";
+  });
+
+  useEffect(() => {
+    if (dark) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [dark]);
+
   return (
-    <div className="min-h-screen bg-[#ECECF7] flex items-center justify-center p-6 overflow-hidden">
+    <div className={`min-h-screen transition-all duration-500 ${
+      dark
+        ? "bg-[#09090B]"
+        : "bg-[#EEF1F7]"
+    }`}>
 
-      <motion.div
-        initial={{ opacity: 0, y: 25 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="relative w-full max-w-7xl h-[720px] bg-white rounded-[35px] overflow-hidden shadow-2xl flex"
-      >
-        {/* LEFT */}
+      {/* Background */}
 
-        <div className="w-full lg:w-[45%] flex flex-col justify-center px-16 z-20">
+      <div className="absolute inset-0 overflow-hidden">
 
-          {/* Logo */}
+        <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-violet-600/30 blur-[130px]" />
 
-          <div className="flex items-center gap-3 mb-20">
-            <div className="w-9 h-9 rounded-full bg-violet-600 flex items-center justify-center text-white font-bold">
-              S
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-fuchsia-600/30 blur-[180px]" />
+
+      </div>
+
+      <div className="relative flex items-center justify-center min-h-screen p-6">
+
+        <motion.div
+          initial={{ opacity: 0, scale: .95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: .5 }}
+          className={`relative overflow-hidden rounded-[40px] max-w-7xl w-full shadow-2xl flex ${
+            dark
+              ? "bg-zinc-900 border border-white/10"
+              : "bg-white"
+          }`}
+        >
+
+          {/* LEFT */}
+
+          <div className="w-full lg:w-[45%] p-12 lg:p-20 flex flex-col justify-center">
+
+            {/* Header */}
+
+            <div className="flex justify-between items-center mb-16">
+
+              <div className="flex items-center gap-3">
+
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-white font-bold text-lg">
+                  K
+                </div>
+
+                <div>
+                  <h3 className={`font-bold ${
+                    dark ? "text-white" : "text-zinc-900"
+                  }`}>
+                    KINGCLOUD
+                  </h3>
+
+                  <p className="text-xs text-zinc-400">
+                    Hosting Panel
+                  </p>
+                </div>
+
+              </div>
+
+              <button
+                onClick={() => setDark(!dark)}
+                className={`w-11 h-11 rounded-xl flex items-center justify-center transition ${
+                  dark
+                    ? "bg-zinc-800 text-yellow-400"
+                    : "bg-zinc-100 text-zinc-700"
+                }`}
+              >
+                {dark ? <Sun size={20} /> : <Moon size={20} />}
+              </button>
+
             </div>
 
-            <span className="font-semibold text-zinc-700">
-              System Logo
-            </span>
-          </div>
+            <h1 className={`text-5xl font-bold ${
+              dark ? "text-white" : "text-zinc-900"
+            }`}>
+              Welcome Back 👋
+            </h1>
 
-          <h1 className="text-5xl font-bold text-zinc-800 leading-tight">
-            Welcome to
-            <br />
-            Login System
-          </h1>
+            <p className="mt-3 text-zinc-400 mb-10">
+              Login to your hosting panel.
+            </p>
 
-          <p className="text-zinc-400 mt-3 mb-12">
-            Sign in by entering the information below
-          </p>
+            {/* Username */}
 
-          {/* Username */}
+            <div className={`flex items-center h-14 rounded-2xl px-5 mb-5 border transition ${
+              dark
+                ? "bg-zinc-800 border-zinc-700"
+                : "bg-zinc-50 border-zinc-200"
+            }`}>
 
-          <div className="relative mb-5">
+              <User className="text-zinc-400" size={18} />
 
-            <User
-              className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-400"
-              size={18}
-            />
+              <input
+                placeholder="Username"
+                className={`ml-4 w-full outline-none bg-transparent ${
+                  dark ? "text-white" : "text-zinc-900"
+                }`}
+              />
 
-            <input
-              type="text"
-              placeholder="Username"
-              className="w-full h-14 rounded-full bg-zinc-100 border border-transparent focus:border-violet-500 outline-none pl-14 pr-5 transition"
-            />
+            </div>
 
-          </div>
+            {/* Password */}
 
-          {/* Password */}
+            <div className={`flex items-center h-14 rounded-2xl px-5 border transition ${
+              dark
+                ? "bg-zinc-800 border-zinc-700"
+                : "bg-zinc-50 border-zinc-200"
+            }`}>
 
-          <div className="relative">
+              <Lock className="text-zinc-400" size={18} />
 
-            <Lock
-              className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-400"
-              size={18}
-            />
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                className={`ml-4 w-full outline-none bg-transparent ${
+                  dark ? "text-white" : "text-zinc-900"
+                }`}
+              />
 
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              className="w-full h-14 rounded-full bg-zinc-100 border border-transparent focus:border-violet-500 outline-none pl-14 pr-14 transition"
-            />
+              <button
+                onClick={() => setShowPassword(!showPassword)}
+                type="button"
+              >
+                {showPassword ? (
+                  <EyeOff className="text-zinc-400" size={18} />
+                ) : (
+                  <Eye className="text-zinc-400" size={18} />
+                )}
+              </button>
 
-            <button
-              type="button"
-              onClick={() =>
-                setShowPassword(!showPassword)
-              }
-              className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-400"
-            >
-              {showPassword ? (
-                <EyeOff size={18} />
-              ) : (
-                <Eye size={18} />
-              )}
-            </button>
+            </div>
 
-          </div>
+            {/* Remember */}
 
-          {/* Options */}
+            <label className="flex items-center gap-3 mt-6 text-sm text-zinc-400">
 
-          <div className="flex justify-between items-center mt-5 text-sm">
+              <input
+                type="checkbox"
+                className="accent-violet-600"
+              />
 
-            <label className="flex items-center gap-2 text-zinc-500">
-
-              <input type="checkbox" />
-
-              Remember me
+              Remember Me
 
             </label>
 
-            <a
-              href="#"
-              className="text-violet-600 hover:underline"
-            >
-              Forgot Password?
-            </a>
+            {/* Login */}
 
-          </div>
-
-          {/* Buttons */}
-
-          <div className="flex items-center gap-8 mt-10">
-
-            <button
-              className="
-              h-14
-              px-12
-              rounded-full
-              bg-gradient-to-r
-              from-violet-600
-              to-fuchsia-500
-              text-white
-              font-semibold
-              shadow-xl
-              hover:scale-105
-              transition
-            "
+            <motion.button
+              whileHover={{
+                scale: 1.03
+              }}
+              whileTap={{
+                scale: .97
+              }}
+              className="mt-10 h-14 rounded-2xl bg-gradient-to-r from-violet-600 via-fuchsia-600 to-purple-700 text-white font-semibold shadow-xl shadow-violet-600/30"
             >
               Login
-            </button>
-
-            <button className="text-zinc-600 hover:text-violet-600 transition font-medium">
-              Sign Up
-            </button>
+            </motion.button>
 
           </div>
 
-        </div>
+          {/* RIGHT */}
 
-        {/* RIGHT */}
+          <div className="hidden lg:flex flex-1 relative items-center justify-center overflow-hidden">
 
-        <div className="hidden lg:flex relative flex-1 items-center justify-center overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-violet-700 via-purple-700 to-fuchsia-700" />
 
-          {/* Purple Background */}
+            <div className="absolute w-[700px] h-[700px] rounded-full bg-white/10 blur-[100px]" />
 
-          <div
-            className="
-            absolute
-            right-0
-            top-0
-            h-full
-            w-full
-            bg-gradient-to-br
-            from-violet-500
-            via-violet-700
-            to-purple-900
-          "
-            style={{
-              clipPath:
-                "ellipse(82% 100% at 100% 50%)",
-            }}
-          />
+            <motion.img
+              animate={{
+                y: [0, -15, 0],
+                rotate: [-10, -8, -10],
+              }}
+              transition={{
+                repeat: Infinity,
+                duration: 5,
+              }}
+              src="https://images.unsplash.com/photo-1517336714739-489689fd1ca8?w=1200"
+              alt="Laptop"
+              className="relative w-[75%] rounded-3xl shadow-2xl rotate-[-10deg]"
+            />
 
-          {/* Glow */}
+          </div>
 
-          <div className="absolute w-[650px] h-[650px] rounded-full bg-white/10 blur-3xl" />
+        </motion.div>
 
-          {/* Laptop */}
+      </div>
 
-          <motion.img
-            animate={{
-              y: [0, -12, 0],
-              rotate: [-10, -8, -10],
-            }}
-            transition={{
-              duration: 5,
-              repeat: Infinity,
-            }}
-            src="https://images.unsplash.com/photo-1517336714739-489689fd1ca8?w=1200"
-            alt=""
-            className="
-              relative
-              w-[70%]
-              rounded-3xl
-              shadow-[0_40px_80px_rgba(0,0,0,.35)]
-              rotate-[-10deg]
-              z-20
-            "
-          />
-
-        </div>
-      </motion.div>
     </div>
   );
 }
