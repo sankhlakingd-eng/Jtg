@@ -1,212 +1,90 @@
-import { useEffect, useState } from "react";
-import { Eye, EyeOff, Moon, Sun, User, Lock } from "lucide-react";
+import React, { useState } from "react"; 
+import { LoadingOverlay } from "../components/LoadingOverlay";
+import { useAuth } from "../context/AuthContext";
+import { useSettings } from "../context/SettingsContext";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Server } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Login() {
-  const [showPassword, setShowPassword] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
+  const { panelName } = useSettings();
+  const navigate = useNavigate();
 
-  const [dark, setDark] = useState(() => {
-    return localStorage.getItem("theme") === "dark";
-  });
-
-  useEffect(() => {
-    if (dark) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post("/api/auth/login", { username, password });
+      login(res.data.token, res.data.user);
+      navigate("/");
+    } catch (err: any) {
+      setError(err.response?.data?.error || "Login failed");
     }
-  }, [dark]);
+  };
 
   return (
-    <div className={`min-h-screen transition-all duration-500 ${
-      dark
-        ? "bg-[#09090B]"
-        : "bg-[#EEF1F7]"
-    }`}>
-
-      {/* Background */}
-
-      <div className="absolute inset-0 overflow-hidden">
-
-        <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-violet-600/30 blur-[130px]" />
-
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-fuchsia-600/30 blur-[180px]" />
-
-      </div>
-
-      <div className="relative flex items-center justify-center min-h-screen p-6">
-
-        <motion.div
-          initial={{ opacity: 0, scale: .95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: .5 }}
-          className={`relative overflow-hidden rounded-[40px] max-w-7xl w-full shadow-2xl flex ${
-            dark
-              ? "bg-zinc-900 border border-white/10"
-              : "bg-white"
-          }`}
-        >
-
-          {/* LEFT */}
-
-          <div className="w-full lg:w-[45%] p-12 lg:p-20 flex flex-col justify-center">
-
-            {/* Header */}
-
-            <div className="flex justify-between items-center mb-16">
-
-              <div className="flex items-center gap-3">
-
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-white font-bold text-lg">
-                  K
-                </div>
-
-                <div>
-                  <h3 className={`font-bold ${
-                    dark ? "text-white" : "text-zinc-900"
-                  }`}>
-                    KINGCLOUD
-                  </h3>
-
-                  <p className="text-xs text-zinc-400">
-                    Hosting Panel
-                  </p>
-                </div>
-
-              </div>
-
-              <button
-                onClick={() => setDark(!dark)}
-                className={`w-11 h-11 rounded-xl flex items-center justify-center transition ${
-                  dark
-                    ? "bg-zinc-800 text-yellow-400"
-                    : "bg-zinc-100 text-zinc-700"
-                }`}
-              >
-                {dark ? <Sun size={20} /> : <Moon size={20} />}
-              </button>
-
-            </div>
-
-            <h1 className={`text-5xl font-bold ${
-              dark ? "text-white" : "text-zinc-900"
-            }`}>
-              Welcome Back 👋
-            </h1>
-
-            <p className="mt-3 text-zinc-400 mb-10">
-              Login to your hosting panel.
-            </p>
-
-            {/* Username */}
-
-            <div className={`flex items-center h-14 rounded-2xl px-5 mb-5 border transition ${
-              dark
-                ? "bg-zinc-800 border-zinc-700"
-                : "bg-zinc-50 border-zinc-200"
-            }`}>
-
-              <User className="text-zinc-400" size={18} />
-
-              <input
-                placeholder="Username"
-                className={`ml-4 w-full outline-none bg-transparent ${
-                  dark ? "text-white" : "text-zinc-900"
-                }`}
-              />
-
-            </div>
-
-            {/* Password */}
-
-            <div className={`flex items-center h-14 rounded-2xl px-5 border transition ${
-              dark
-                ? "bg-zinc-800 border-zinc-700"
-                : "bg-zinc-50 border-zinc-200"
-            }`}>
-
-              <Lock className="text-zinc-400" size={18} />
-
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Password"
-                className={`ml-4 w-full outline-none bg-transparent ${
-                  dark ? "text-white" : "text-zinc-900"
-                }`}
-              />
-
-              <button
-                onClick={() => setShowPassword(!showPassword)}
-                type="button"
-              >
-                {showPassword ? (
-                  <EyeOff className="text-zinc-400" size={18} />
-                ) : (
-                  <Eye className="text-zinc-400" size={18} />
-                )}
-              </button>
-
-            </div>
-
-            {/* Remember */}
-
-            <label className="flex items-center gap-3 mt-6 text-sm text-zinc-400">
-
-              <input
-                type="checkbox"
-                className="accent-violet-600"
-              />
-
-              Remember Me
-
-            </label>
-
-            {/* Login */}
-
-            <motion.button
-              whileHover={{
-                scale: 1.03
-              }}
-              whileTap={{
-                scale: .97
-              }}
-              className="mt-10 h-14 rounded-2xl bg-gradient-to-r from-violet-600 via-fuchsia-600 to-purple-700 text-white font-semibold shadow-xl shadow-violet-600/30"
+    <div className="min-h-screen flex items-center justify-center bg-transparent font-sans relative overflow-hidden">
+      {/* Background ambient glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-500/10 blur-[150px] rounded-full pointer-events-none" />
+      
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.5, type: "spring", stiffness: 300, damping: 25 }}
+        className="max-w-[420px] w-full bg-black/40 backdrop-blur-3xl p-10 rounded-[2rem] shadow-[0_0_50px_-10px_rgba(0,0,0,0.8)] border border-white/10 ring-1 ring-white/5 relative z-10 m-4 overflow-hidden group"
+      >
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
+        
+        <div className="flex flex-col items-center mb-10 mt-2">
+          <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-4 rounded-2xl mb-5 shadow-[0_0_20px_rgba(99,102,241,0.4)]">
+            <Server className="w-8 h-8 text-white" />
+          </div>
+          <h2 className="text-4xl font-black text-white tracking-tight drop-shadow-md">{panelName}</h2>
+          <p className="text-indigo-400/80 font-bold uppercase tracking-widest text-[10px] mt-3">Authenticate to platform controls</p>
+        </div>
+        
+        {error && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              className="bg-red-500/10 border border-red-500/30 text-red-400 p-3.5 rounded-xl text-sm mb-6 text-center font-medium shadow-inner"
             >
-              Login
-            </motion.button>
-
-          </div>
-
-          {/* RIGHT */}
-
-          <div className="hidden lg:flex flex-1 relative items-center justify-center overflow-hidden">
-
-            <div className="absolute inset-0 bg-gradient-to-br from-violet-700 via-purple-700 to-fuchsia-700" />
-
-            <div className="absolute w-[700px] h-[700px] rounded-full bg-white/10 blur-[100px]" />
-
-            <motion.img
-              animate={{
-                y: [0, -15, 0],
-                rotate: [-10, -8, -10],
-              }}
-              transition={{
-                repeat: Infinity,
-                duration: 5,
-              }}
-              src="https://images.unsplash.com/photo-1517336714739-489689fd1ca8?w=1200"
-              alt="Laptop"
-              className="relative w-[75%] rounded-3xl shadow-2xl rotate-[-10deg]"
+              {error}
+            </motion.div>
+        )}
+        
+        <form onSubmit={handleLogin} className="space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-zinc-400 mb-1.5">Username</label>
+            <input 
+              type="text" 
+              className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all shadow-inner"
+              value={username}
+              onChange={e => setUsername(e.target.value)}
+              required
             />
-
           </div>
-
-        </motion.div>
-
-      </div>
-
+          <div>
+            <label className="block text-sm font-medium text-zinc-400 mb-1.5">Password</label>
+            <input 
+              type="password" 
+              className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all shadow-inner"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" className="w-full bg-white text-zinc-900 font-bold rounded-xl px-4 py-3.5 transition-all mt-4 hover:bg-zinc-200 active:scale-[0.98] shadow-lg shadow-white/10">
+            Sign In
+          </button>
+        </form>
+      </motion.div>
+      {isLoading && <LoadingOverlay message="Logging in..." />}
     </div>
   );
 }
